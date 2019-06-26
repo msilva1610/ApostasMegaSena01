@@ -1,0 +1,10 @@
+__pycache__
+.vscode
+backup
+DownloadApostas
+venv
+*.db
+*.log
+*.code-workspace
+*.zip
+*.gif
