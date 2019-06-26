@@ -8,3 +8,4 @@ venv
 *.code-workspace
 *.zip
 *.gif
+*.db-journal
