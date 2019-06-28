@@ -14,7 +14,7 @@ def unzipMegaSena():
     zip_ref.extractall()
     zip_ref.close()    
 
-print('Fazendo download mega sena ...')
-# DownloadingMegaSena()
-print('descompactando mega sena ...')
+print('Fazendo download resultados megasena ...')
+DownloadingMegaSena()
+print('Descompactando resultados megasena ...')
 unzipMegaSena()

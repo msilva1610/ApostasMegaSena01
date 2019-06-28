@@ -16,7 +16,7 @@ logging.info('Inicio')
 
 
 def SalvaTodasQuadras01(ListaQuinas):
-    logging.info('Inserindo lote na tabela sorteiosquadra')
+    logging.info('Inserindo lote na tabela sorteiosquina')
 
     sql = """
         INSERT INTO sorteiosquina (id_concurso, dezQuadra01,dezQuadra02,dezQuadra03,dezQuadra04, dezQuadra05)
@@ -108,7 +108,7 @@ def CritaTabelaSorteioQuadra():
 
     conn.commit()
     conn.close()  
-    logging.info('Tabela sorteio quina criada com sucesso')
+    logging.info('Tabela sorteioquina criada com sucesso')
 
 
 def Orquestrador():

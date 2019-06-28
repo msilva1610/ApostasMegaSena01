@@ -85,7 +85,7 @@ def ApagaTabelaApostas():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()   
 
-        logging.info('Apagando tabela caso não exista.') 
+        logging.info('Apagando tabela caso exista.') 
        
         cursor.execute("""
         DROP TABLE IF EXISTS apostas6dezenas; 
