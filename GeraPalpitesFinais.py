@@ -59,7 +59,7 @@ def criaTabelapalpitesfinais():
 
 def ListaPalpites01():
     sql = """
-    SELECT a.dez01,a.dez02,a.dez03,a.dez04,a.dez05,a.dez06
+    SELECT a.id, a.dez01,a.dez02,a.dez03,a.dez04,a.dez05,a.dez06
     FROM apostas6dezenasrefinadasPlus b, apostas6dezenas a
     where a.id = b.id;
     """
@@ -122,11 +122,12 @@ def Orquestrador():
     print('Quantidades de palpites: {}'.format(QtdePalpites))
 
     bar = progressbar.ProgressBar(maxval=QtdePalpites, \
-        widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])    
+        widgets=[progressbar.Bar('=', '[', ']'), 'Processando ... ', progressbar.Percentage()])    
 
     bar.start()
     logging.info('Iniciando loop em lista de palpites... ')
     for palpite in ListaPalpites:
+        qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas = 0,0,0,0
         contador += 1
         for quina in ListaDeQuinas:
             q = list(set(quina) & set(palpite))
@@ -151,13 +152,13 @@ def Orquestrador():
         bar.update(contadorPalpites)
         if contador == 10000:
             logging.info('Salvando palpite ' + str(contadorPalpites))
-            cursor.commit()
+            conn.commit()
             contador = 0
 
     if contador > 0:
-        cursor.commit()
+        conn.commit()
     
-    cursor.close()
+    conn.close()
     bar.finish()
   
 
