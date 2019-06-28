@@ -22,7 +22,7 @@ def dropTabelapalpitesfinais():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    logging.info('Criando a tabela palpitesfinais caso não exista.')
+    logging.info('Drop tabela palpitesfinais caso exista.')
 
     cursor.execute("""
         DROP TABLE IF EXISTS palpitesfinais;
@@ -119,12 +119,14 @@ def Orquestrador():
     ListaPalpites = ListaPalpites01()
     QtdePalpites = len(ListaPalpites)
 
+    print('Quantidades de palpites: {}'.format(QtdePalpites))
+
     bar = progressbar.ProgressBar(maxval=QtdePalpites, \
         widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])    
 
     bar.start()
     logging.info('Iniciando loop em lista de palpites... ')
-    for palpite in ListaPalpites01():
+    for palpite in ListaPalpites:
         contador += 1
         for quina in ListaDeQuinas:
             q = list(set(quina) & set(palpite))
@@ -145,50 +147,22 @@ def Orquestrador():
         dez06 = palpite[5]
 
         cursor.execute(sql, (dez01, dez02, dez03, dez04, dez05, dez06, qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas,))
-
-        if contador == 100000:
-            logging.info('Salvando palpite ' + str(contadorPalpites + 1))
-            cursor.commit()
-            contador = 0
-
         contadorPalpites += 1
         bar.update(contadorPalpites)
+        if contador == 10000:
+            logging.info('Salvando palpite ' + str(contadorPalpites))
+            cursor.commit()
+            contador = 0
 
     if contador > 0:
         cursor.commit()
     
     cursor.close()
     bar.finish()
-
-
-def Teste04():
-    dezenas = [1,2,3,4,5,6]
-    quina = [1,2,3,4,5]
-    TotalDezenas = list(set(dezenas) & set(quina))  # Encontra os iguais
-    print(TotalDezenas)
-
-
-def Teste03():
-    l = ((1,2,3),(1,2,4),(1,2,5))
-    #l = [[1,2,3],[1,2,4],[1,2,5]]
-    a = l.index((1,2,5)) # funcionou
-    print(a)
-
-
-def TesteBarraProgressiva():
-    bar = progressbar.ProgressBar(maxval=20, \
-        widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-    bar.start()
-    for i in range(20):
-        bar.update(i+1)
-        sleep(5.1)
-    bar.finish()    
+  
 
 if __name__ == '__main__':
     dropTabelapalpitesfinais()
     criaTabelapalpitesfinais()
     Orquestrador()
-    #Teste03()
-    # Teste04()
-    # TesteBarraProgressiva()
     logging.info('Fim ...')
