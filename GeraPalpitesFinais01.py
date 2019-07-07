@@ -10,7 +10,7 @@ from time import sleep
 import progressbar
 
 
-logging.basicConfig(filename='GeraPalpitesFinais.log', level=logging.DEBUG,
+logging.basicConfig(filename='GeraPalpitesFinais01.log', level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s - %(message)s')
 
 logging.info('Inicio ...')
@@ -36,52 +36,11 @@ def TrataCampo(linha):
     return id_aposta, dezenas
 
 
-def dropTabelapalpitesfinais():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    logging.info('Drop tabela palpitesfinais caso exista.')
-
-    cursor.execute("""
-        DROP TABLE IF EXISTS palpitesfinais;
-    """)
-    conn.commit()
-    conn.close()
-
-
-def criaTabelapalpitesfinais():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    logging.info('Criando a tabela palpitesfinais caso não exista.')
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS palpitesfinais
-        (id INTEGER NOT NULL PRIMARY KEY,
-         dez01 INT,
-         dez02 INT,
-         dez03 INT,
-         dez04 INT,
-         dez05 INT,
-         dez06 INT,
-         qtdeTernosSorteadas INT,
-         qtdeQuadrasSorteadas INT,
-         qtdeQuinasSorteadas INT,
-         qtdeSenasSorteadas INT);
-    """)
-    conn.commit()
-    conn.close()
-
-
 def ListaPalpites01():
     sql = """
     SELECT a.id, a.dez01,a.dez02,a.dez03,a.dez04,a.dez05,a.dez06
     FROM apostas6dezenasrefinadasPlus b, apostas6dezenas a
-    where a.id = b.id;
+    where a.id = b.id LIMIT 40000;
     """
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
@@ -123,20 +82,13 @@ def ListaDeQuinasSorteadas():
 
 
 def Orquestrador():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()    
-    sql = """
-    INSERT INTO palpitesfinais
-    (id, dez01, dez02, dez03, dez04, dez05, dez06, qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """
     contador = 0
     contadorPalpites = 0 
     qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas = 0,0,0,0
+
     ListaDeQuinas = ListaDeQuinasSorteadas()
     ListaPalpites = ListaPalpites01()
+
     QtdePalpites = len(ListaPalpites)
 
     print('Quantidades de palpites: {}'.format(QtdePalpites))
@@ -150,9 +102,11 @@ def Orquestrador():
         qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas = 0,0,0,0
         contador += 1
         id_aposta, dezenas = TrataCampo(palpite)
+        # q = []
+        q = 0
         for quina in ListaDeQuinas:
-            # q = list(set(quina) & set(palpite))
-            # qtde = len(q)
+            #q = list(set(quina) & set(dezenas))
+            #qtde = len(q)
             qtde = contaQuinas(dezenas,quina)
             if qtde == 3:
                 qtdeTernosSorteadas += 1
@@ -162,30 +116,23 @@ def Orquestrador():
                 qtdeQuinasSorteadas += 1 
             elif qtde == 6:
                 qtdeSenasSorteadas += 1
-        dez01 = palpite[1]
-        dez02 = palpite[2]  
-        dez03 = palpite[3] 
-        dez04 = palpite[4] 
-        dez05 = palpite[5] 
-        dez06 = palpite[6]
+        dez01 = dezenas[0]
+        dez02 = dezenas[1]  
+        dez03 = dezenas[2] 
+        dez04 = dezenas[3] 
+        dez05 = dezenas[4] 
+        dez06 = dezenas[5]
 
-        cursor.execute(sql, (id_aposta, dez01, dez02, dez03, dez04, dez05, dez06, qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas,))
         contadorPalpites += 1
         bar.update(contadorPalpites)
         if contador == 10000:
             logging.info('Salvando palpite ' + str(contadorPalpites))
-            conn.commit()
             contador = 0
 
-    if contador > 0:
-        conn.commit()
     
-    conn.close()
     bar.finish()
   
 
 if __name__ == '__main__':
-    dropTabelapalpitesfinais()
-    criaTabelapalpitesfinais()
     Orquestrador()
     logging.info('Fim ...')
