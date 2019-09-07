@@ -117,17 +117,17 @@ def CalculaIntervaloDezena(dezenas):
     dezenas.sort()
     for d in dezenas:
         dz += 1
-        if (d not in range(1,26) and d == 1):
+        if (d not in range(1,26) and dz == 1):
             IntervalorDezenaOk = False
-        elif (d not in range(2,37) and d == 2):
+        elif (d not in range(2,37) and dz == 2):
             IntervalorDezenaOk = False
-        elif (d not in range(5,47) and d == 3):
+        elif (d not in range(5,47) and dz == 3):
             IntervalorDezenaOk = False
-        elif (d not in range(13,54) and d == 4):
+        elif (d not in range(13,54) and dz == 4):
             IntervalorDezenaOk = False
-        elif (d not in range(23,59) and d == 5):
+        elif (d not in range(23,59) and dz == 5):
             IntervalorDezenaOk = False
-        elif (d not in range(35,60) and d == 6):
+        elif (d not in range(35,60) and dz == 6):
             IntervalorDezenaOk = False
     return IntervalorDezenaOk
 
