@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sqlite3
 import sys
 import glob
@@ -278,7 +279,6 @@ def CalculaMultiplosJson(dezenas):
             for d in dezenas:
                 if d >= m:
                     if d % m == 0:
-                        #Essa dezena (d) é multiplo de m
                         tot_m += 1
             if tot_m > 1:
                 multiplos['de'].append({str(m):tot_m})
@@ -296,7 +296,7 @@ def droptabelarefinada():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    logging.info('apagando tabela caso não exista.')
+    logging.info('apagando tabela caso nao exista.')
 
     cursor.execute("DROP TABLE IF EXISTS apostas6dezenasrefinadas;")
     conn.close()

@@ -68,6 +68,7 @@ def SalvaApostasDB(ListaDeApostas):
         if conn is not None:
             conn.close
 
+
 def GeraTodasCombinacoesApostas():
     dezenas = 6
     clsApostas = Apostas()

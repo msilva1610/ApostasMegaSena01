@@ -40,7 +40,7 @@ def ListaPalpites01():
     sql = """
     SELECT a.id, a.dez01,a.dez02,a.dez03,a.dez04,a.dez05,a.dez06
     FROM apostas6dezenasrefinadasPlus b, apostas6dezenas a
-    where a.id = b.id LIMIT 40000;
+    where a.id = b.id;
     """
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")

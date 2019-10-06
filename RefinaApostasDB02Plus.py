@@ -110,7 +110,7 @@ def GeratabelarefinadaPlus():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    logging.info('Executando inser na table refinadaplus.')
+    logging.info('Executando insert na table refinadaplus.')
 
     cursor.execute("""
         insert into apostas6dezenasrefinadasPlus

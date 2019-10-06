@@ -52,14 +52,14 @@ def MontaListaSorteios():
     cursor = conn.cursor()
     TempoInicial = datetime.datetime.now()
 
-    logging.info('Criando Tabela sorteioquina caso não exista ...') 
+    logging.info('executando select na tabela de concurso ...') 
     cursor.execute(sql)    
 
     ListaSorteios = cursor.fetchall()
 
     # conn.commit()
     conn.close()  
-    logging.info('Tabela sorteioquina criada com sucesso')
+    logging.info('select na tabela sorteiosquina executado com sucesso')
     return ListaSorteios
 
 
@@ -88,7 +88,7 @@ def dropTabelaSorteioQuadra():
 
 def CritaTabelaSorteioQuadra():
     sql = """
-        CREATE TABLE IF NOT EXISTS sorteiosquina
+        CREATE TABLE IF NOT EXISTS sorteiosquina 
         (id INTEGER NOT NULL PRIMARY KEY,
          id_concurso INT NOT NULL,
          dezQuadra01 int,
