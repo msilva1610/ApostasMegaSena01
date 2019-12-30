@@ -42,18 +42,24 @@ def Imprimirnum():
     print("Calculando total de apostas ...")
     totalApostas = len(apostas)
     print("Total de Apostas: {}".format(totalApostas))
-    ultimosorteio = [9,18,19,22,42,47]
+    ultimosorteio = [14,24,32,38,46,53]
     totDezenas = 0
     r = 0
     while (totDezenas < 28):
+        proximo = False
         time.sleep(5)
         id = random.randrange(totalApostas)
         aposta = apostas[id]
         for a in aposta:
             if a in ultimosorteio:
-                continue
-        print('aposta: {} - {}'.format(totDezenas, aposta))    
-        totDezenas += 1
+                proximo = True
+                break
+        # print('aposta: {} - {} {} {} {} {} {}'.format(totDezenas, aposta))    
+        if proximo:
+            continue
+        else:
+            print("{:02d} {:02d} {:02d} {:02d} {:02d} {:02d}".format(aposta[1], aposta[2],aposta[3],aposta[4],aposta[5],aposta[6]))    
+            totDezenas += 1
 
 
 if __name__ == '__main__':

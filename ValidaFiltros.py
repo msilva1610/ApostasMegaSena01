@@ -362,9 +362,11 @@ def Orquestrador():
             listaApostasRefinadas = MontaListaApostasRefinadas(id_inicial, id_final)
             InsertTabelaApostasRefinadasCerta(listaApostasRefinadas)
 
-
-if __name__ == '__main__':
+def main():
     droptabelarefinadaCerta()
     criaTabelaApostasRefinadasCerta()
     Orquestrador()
     logging.info('Fim')
+
+if __name__ == '__main__':
+    main()

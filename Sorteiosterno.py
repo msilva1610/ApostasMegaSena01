@@ -9,18 +9,18 @@ import io
 import itertools
 
 
-logging.basicConfig(filename='sorteioquadra.log', level=logging.DEBUG,
+logging.basicConfig(filename='sorteioternos.log', level=logging.DEBUG,
                     format=' %(asctime)s - %(levelname)s - %(message)s')
 
-logging.info('Criando tabela sorteiosquadra')
+logging.info('Criando tabela sorteiosternos')
 
 
-def SalvaTodasQuadras01(ListaQuadras):
-    logging.info('Inserindo lote na tabela sorteiosquadra')
+def SalvaTodasTernos(ListaTernos):
+    logging.info('Inserindo lote na tabela sorteiosterno')
 
     sql = """
-        INSERT INTO sorteiosquadra (id_concurso, dezQuadra01,dezQuadra02,dezQuadra03,dezQuadra04)
-        VALUES (?,?,?,?,?);
+        INSERT INTO sorteiosterno (id_concurso, dezTerno01,dezTerno02,dezTerno03)
+        VALUES (?,?,?,?);
     """
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
@@ -28,18 +28,17 @@ def SalvaTodasQuadras01(ListaQuadras):
     cursor = conn.cursor()
     TempoInicial = datetime.datetime.now()
 
-    for quadra in ListaQuadras['Quadras']:
-        id_concurso = quadra['id_concurso']
-        dezQuadra01 = quadra['QuadrasPorSorteio'][0]
-        dezQuadra02 = quadra['QuadrasPorSorteio'][1]
-        dezQuadra03 = quadra['QuadrasPorSorteio'][2]
-        dezQuadra04 = quadra['QuadrasPorSorteio'][3]
+    for terno in ListaTernos['Ternos']:
+        id_concurso = terno['id_concurso']
+        dezTerno01 = terno['TernosPorSorteio'][0]
+        dezTerno02 = terno['TernosPorSorteio'][1]
+        dezTerno03 = terno['TernosPorSorteio'][2]
 
-        cursor.execute(sql,(id_concurso,dezQuadra01,dezQuadra02,dezQuadra03,dezQuadra04))
+        cursor.execute(sql,(id_concurso,dezTerno01,dezTerno02,dezTerno03))
 
     conn.commit()
     cursor.close()
-    logging.info('Lote Inserido com sucesso na tabela sorteiosquadra')
+    logging.info('Lote Inserido com sucesso na tabela sorteiosTerno')
 
 
 def MontaListaSorteios():
@@ -52,49 +51,48 @@ def MontaListaSorteios():
     cursor = conn.cursor()
     TempoInicial = datetime.datetime.now()
 
-    logging.info('Criando Tabela sorteioquadra caso não exista ...') 
+    logging.info('Selecionando sorteios na tabela de sorteios') 
     cursor.execute(sql)    
 
     ListaSorteios = cursor.fetchall()
 
     # conn.commit()
     conn.close()  
-    logging.info('Tabela sorteio quadra criada com sucesso')
+    logging.info('Tabela selecionada com sucesso')
     return ListaSorteios
 
 
-def GeraTodasQuadras(sorteio, numDezenas):
+def GeraTodasTernos(sorteio, numDezenas):
     logging.info('Criando combinações')
     ListaCombinacoes = list(itertools.combinations(sorteio, numDezenas))
     logging.info('combinações criadas com sucesso')
     return ListaCombinacoes
 
 
-def dropTabelaSorteioQuadra():
+def dropTabelaSorteioTerno():
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    logging.info('apagando tabela sorteioquadra caso não exista.')
+    logging.info('apagando tabela sorteiosterno caso não exista.')
 
-    cursor.execute("DROP TABLE IF EXISTS sorteiosquadra;")
+    cursor.execute("DROP TABLE IF EXISTS sorteiosterno;")
 
-    logging.info('Tabela sorteio quadra apagada com sucesso.')
+    logging.info('Tabela sorteiosterno apagada com sucesso.')
 
     conn.close()
 
 
-def CritaTabelaSorteioQuadra():
+def CriarTabelaSorteiosTerno():
     sql = """
-        CREATE TABLE IF NOT EXISTS sorteiosquadra
+        CREATE TABLE IF NOT EXISTS sorteiosterno
         (id INTEGER NOT NULL PRIMARY KEY,
          id_concurso INT NOT NULL,
-         dezQuadra01 int,
-         dezQuadra02 int,
-         dezQuadra03 int,
-         dezQuadra04 int);
+         dezTerno01 int,
+         dezTerno02 int,
+         dezTerno03 int);
     """
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "ApostasMegaSena.db")
@@ -102,26 +100,26 @@ def CritaTabelaSorteioQuadra():
     cursor = conn.cursor()
     TempoInicial = datetime.datetime.now()
 
-    logging.info('Criando Tabela sorteioquadra caso nãoo exista ...') 
+    logging.info('Criando Tabela sorteiosterno caso não exista ...') 
     cursor.execute(sql)    
 
     conn.commit()
     conn.close()  
-    logging.info('Tabela sorteio quadra criada com sucesso')
+    logging.info('Tabela sorteiosterno criada com sucesso')
 
 
 def main():
-    dropTabelaSorteioQuadra()
-    CritaTabelaSorteioQuadra()
+    dropTabelaSorteioTerno()
+    CriarTabelaSorteiosTerno()
     ListaSorteios = MontaListaSorteios()
 
     DezenasSorteios = []
-    ListaQuadras = {}
-    ListaQuadras['Quadras'] = []
+    ListaTernos = {}
+    ListaTernos['Ternos'] = []
     contador = 0
     for linha in ListaSorteios:
         DezenasSorteios = []
-        ListaQuadras['Quadras'] = []
+        ListaTernos['Ternos'] = []
 
         id_concurso = linha[0]
         DezenasSorteios.append(linha[1])
@@ -132,10 +130,11 @@ def main():
         DezenasSorteios.append(linha[6])
         DezenasSorteios.sort()
 
-        ListaQuadrasPorSorteio = GeraTodasQuadras(DezenasSorteios,4)    
-        for quadra in ListaQuadrasPorSorteio:
-            ListaQuadras['Quadras'].append({'id_concurso': id_concurso, 'QuadrasPorSorteio':list(quadra)})
-        SalvaTodasQuadras01(ListaQuadras)
+        ListaTernosPorSorteio = GeraTodasTernos(DezenasSorteios,3)    
+        for terno in ListaTernosPorSorteio:
+            dezenas = list(terno)
+            ListaTernos['Ternos'].append({'id_concurso': id_concurso, 'TernosPorSorteio':list(dezenas)})
+        SalvaTodasTernos(ListaTernos)
 
 
 if __name__ == '__main__':
