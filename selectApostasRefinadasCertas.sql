@@ -1,25 +1,4 @@
-SELECT a.id,
-       dez01,
-       dez02,
-       dez03,
-       dez04,
-       dez05,
-       dez06,
-       impares,
-       pares,
-       quadrante,
-       totaldeprimos,
-       qtdeDezFinonacci,
-       somadasdezenas,
-       SomaDosDigitosDaDezena,
-       TotNumquadraticos,
-       TotalColunas,
-       totConsecutivos,
-       IntervalorDezenaOk,
-       TotalDigitos,
-       TotalParesDezenasEspelho,
-       razao,
-       m
+SELECT count(*)
   FROM apostas6dezenasrefinadascerta a, apostas6dezenasrefinadas b
   where a.id = b.id
   and a.impares = 1
@@ -38,9 +17,5 @@ SELECT a.id,
   and a.razao = 1
   and a.m = 1
   and (b.qtde_q1 <= 3 or b.qtde_q2 <= 3 or b.qtde_q3 <= 3 or b.qtde_q4 <= 3)
-  and a.dez01 = 9
-  and a.dez02 = 18
-  and a.dez03 = 19
-  and a.dez04 = 22
-  and a.dez05 = 42
-  and a.dez06 = 47
+-- 29162395
+-- 810.664 ms
