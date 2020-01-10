@@ -8,6 +8,12 @@ import logging
 import datetime
 from time import sleep
 import progressbar
+import requests
+
+import threading
+import multiprocessing
+
+from multiprocessing.dummy import Pool
 
 
 logging.basicConfig(filename='GeraPalpitesFinais.log', level=logging.DEBUG,
@@ -95,7 +101,7 @@ def ListaPalpites01():
     and a.TotalDigitos = 1
     and a.TotalParesDezenasEspelho = 1
     and a.razao = 1
-    and a.m = 1;
+    and a.m = 1 limit 100;
     """
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -149,7 +155,7 @@ def Orquestrador():
     """
     contador = 0
     contadorPalpites = 0 
-    qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas = 0,0,0,0
+    # qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas = 0,0,0,0
     ListaDeQuinas = ListaDeQuinasSorteadas()
     ListaPalpites = ListaPalpites01()
     QtdePalpites = len(ListaPalpites)
@@ -161,37 +167,58 @@ def Orquestrador():
 
     bar.start()
     logging.info('Iniciando loop em lista de palpites... ')
+    arrdata = []
+    contarequests = 0 
+    futures = []
     for palpite in ListaPalpites:
+
         qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas = 0,0,0,0
         contador += 1
-        id_aposta, dezenas = TrataCampo(palpite)
-        for quina in ListaDeQuinas:
-            # q = list(set(quina) & set(palpite))
-            # qtde = len(q)
-            qtde = contaQuinas(dezenas,quina)
-            if qtde == 3:
-                qtdeTernosSorteadas += 1
-            elif qtde == 4:
-                qtdeQuadrasSorteadas += 1
-            elif qtde == 5:
-                qtdeQuinasSorteadas += 1 
-            elif qtde == 6:
-                qtdeSenasSorteadas += 1
-        dez01 = palpite[1]
-        dez02 = palpite[2]  
-        dez03 = palpite[3] 
-        dez04 = palpite[4] 
-        dez05 = palpite[5] 
-        dez06 = palpite[6]
-
-        cursor.execute(sql, (id_aposta, dez01, dez02, dez03, dez04, dez05, dez06, qtdeTernosSorteadas, qtdeQuadrasSorteadas, qtdeQuinasSorteadas, qtdeSenasSorteadas,))
         contadorPalpites += 1
-        bar.update(contadorPalpites)
-        if contador == 10000:
-            logging.info('Salvando palpite ' + str(contadorPalpites))
-            conn.commit()
-            contador = 0
 
+        id_aposta, dezenas = TrataCampo(palpite)
+
+
+        data = {'id_aposta':id_aposta, 'dezenas': dezenas, 'listaQuinas':ListaDeQuinas}
+        arrdata.append(data)
+        contarequests += 1 
+        bar.update(contadorPalpites)
+        
+        if contarequests == 10:
+            jsonData = json.dumps(arrdata)
+            pool = Pool(10)
+            
+            futures.append(pool.apply_async(requests.post,['http://localhost:8090/calcQuinas'],{'data': jsonData} ))
+            # r = requests.post('http://localhost:8090/calcQuinas', data = jsonData)
+        if len(futures) < 10:
+            print('len de futures: {}'.format(len(futures)))
+            continue
+        else:
+            for future in futures:
+                retornocalc = future.get().json()
+                print(retornocalc)
+                for retorno in retornocalc:
+                    id_aposta = retorno['id_aposta']
+                    qtdeTernosSorteadas = retorno['Ternos']
+                    qtdeQuadrasSorteadas = retorno['Quadras']
+                    qtdeQuinasSorteadas = retorno['Quinas']
+                    qtdeSenasSorteadas = 0
+                    dez01 = palpite[1]
+                    dez02 = palpite[2]  
+                    dez03 = palpite[3] 
+                    dez04 = palpite[4] 
+                    dez05 = palpite[5] 
+                    dez06 = palpite[6]
+                    cursor.execute(sql, (int(id_aposta), dez01, dez02, dez03, dez04, dez05, dez06, int(qtdeTernosSorteadas), int(qtdeQuadrasSorteadas), int(qtdeQuinasSorteadas), qtdeSenasSorteadas,))
+                # bar.update(contadorPalpites)
+            if contador == 1:
+                logging.info('Salvando palpite ' + str(contadorPalpites))
+                conn.commit()
+                contador = 0
+            arrdata = []
+            contarequests = 0
+            futures = []
+            
     if contador > 0:
         conn.commit()
     
@@ -200,7 +227,13 @@ def Orquestrador():
   
 
 if __name__ == '__main__':
+    start = datetime.datetime.now()
+
     dropTabelapalpitesfinais()
     criaTabelapalpitesfinais()
     Orquestrador()
+
+    end = datetime.datetime.now() - start
+    print("tempo total: {}".format(end))
+
     logging.info('Fim ...')
