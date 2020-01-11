@@ -55,7 +55,7 @@ def InsertTabelaApostasRefinadasCerta(listaApostasRefinadas):
             m = campos['m']
 
             cursor.execute("""
-            INSERT INTO  (id,dez01,dez02,dez03,dez04,dez05,
+            INSERT INTO apostas6dezenasrefinadascerta (id,dez01,dez02,dez03,dez04,dez05,
                     dez06,impares,pares,quadrante,totaldeprimos,qtdeDezFinonacci,somadasdezenas,
                     SomaDosDigitosDaDezena,TotNumquadraticos,TotalColunas,totConsecutivos,
                     IntervalorDezenaOk,TotalDigitos,TotalParesDezenasEspelho,razao,m)
@@ -76,7 +76,7 @@ def droptabelarefinadaCerta():
 
     logging.info('apagando tabela caso não exista.')
 
-    cursor.execute("DROP TABLE IF EXISTS ;")
+    cursor.execute("DROP TABLE IF EXISTS apostas6dezenasrefinadascerta;")
     conn.close()
 
 
@@ -89,7 +89,7 @@ def criaTabelaApostasRefinadasCerta():
     logging.info('Criando a tabela caso não exista.')
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS 
+        CREATE TABLE IF NOT EXISTS apostas6dezenasrefinadascerta
         (id INTEGER,
          dez01 INT,
          dez02 INT,
